@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zohaib Hassan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Familjen+Grotesk:wght@400;500;600&family=Martian+Mono:wght@400;500&display=swap">
+<style>
+/* Layout concept: a red band with a huge stacked name and a working PID tuning scope, then quiet editorial rows with no boxes. Red is loud once, everything else is ink on paper. */
+:root {
+  --paper: #ECEEF3;
+  --surface: #FFFFFF;
+  --ink: #0B0F1A;
+  --muted: #4A5368;
+  --line: #B9C0D0;
+  --red: #C8260A;
+  --yellow: #FFD21A;
+  --blue: #2540D9;
+  --green: #1F9A4D;
+  --band: #D42A0A;
+  --band-ink: #FFFFFF;
+  --font-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --font-body: "Familjen Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0E121C; --surface: #171C2A; --ink: #EDEFF5; --muted: #A0A9BE; --line: #2C3448;
+    --red: #FF6A45; --yellow: #FFD84A; --blue: #8DA0FF; --green: #5FD38A;
+    --band: #C9290B; --band-ink: #FFFFFF;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0E121C; --surface: #171C2A; --ink: #EDEFF5; --muted: #A0A9BE; --line: #2C3448;
+  --red: #FF6A45; --yellow: #FFD84A; --blue: #8DA0FF; --green: #5FD38A;
+  --band: #C9290B; --band-ink: #FFFFFF;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.6; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+.inner { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.mono { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; }
+.u { background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat; transition: background-size 0.2s ease; text-decoration: none; padding-bottom: 2px; }
+.u:hover { background-size: 100% 2px; }
+
+/* hero band */
+.band { overflow-x: clip; background: var(--band); color: var(--band-ink); padding-block: 0 56px; }
+.bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 24px; padding-block: 18px; border-bottom: 2px solid currentColor; }
+.bar nav { display: flex; flex-wrap: wrap; gap: 4px 22px; }
+.name { margin: 40px 0 0; font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: clamp(4.5rem, 24vw, 18rem); line-height: 0.8; letter-spacing: -0.01em; }
+.name .line { display: block; overflow: hidden; padding-top: 0.04em; white-space: nowrap; }
+.name .line + .line { margin-left: clamp(0.5rem, 9vw, 7rem); }
+.name span.l { display: inline-block; transition: color 0.12s; animation: drop 0.7s cubic-bezier(0.2, 0.9, 0.2, 1) backwards; animation-delay: calc(var(--i) * 45ms); }
+.name span.l:hover { color: var(--yellow); }
+@keyframes drop { from { transform: translateY(105%); } }
+.hero-low { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 36px 56px; margin-top: 40px; align-items: start; }
+.lede { font-size: clamp(1.15rem, 2.2vw, 1.45rem); line-height: 1.45; margin: 0 0 20px; max-width: 28em; font-weight: 500; }
+.facts { display: grid; gap: 4px; margin: 0; opacity: 0.9; }
+
+/* PID scope */
+.scope { margin: 0; display: grid; gap: 14px; min-width: 0; }
+.screen { position: relative; background: #0B0F1A; line-height: 0; }
+.screen canvas { width: 100%; aspect-ratio: 2 / 1; display: block; }
+.readout { position: absolute; left: 12px; top: 10px; right: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; line-height: 1.4; color: #FFD21A; font-size: 11px; pointer-events: none; }
+.knobs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px; }
+.knob { display: grid; gap: 4px; min-width: 0; }
+.knob label { display: flex; justify-content: space-between; gap: 8px; }
+.knob output { font-weight: 500; }
+.knob input { width: 100%; accent-color: var(--yellow); margin: 0; min-height: 28px; }
+.scope figcaption { opacity: 0.9; text-transform: none; letter-spacing: 0.02em; line-height: 1.5; font-size: 12px; }
+
+section { padding-block: 88px 0; }
+.sec-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 24px; margin-bottom: 8px; }
+.sec-title h2 { margin: 0; font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: clamp(2.6rem, 8vw, 5.5rem); line-height: 0.85; letter-spacing: -0.005em; }
+.sec-title .mono { color: var(--muted); }
+
+/* projects */
+.proj { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 32px 56px; padding-block: 56px; border-top: 2px solid var(--ink); align-items: start; }
+.proj:nth-of-type(even) .shot { order: 2; }
+.shot { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border: 2px solid var(--ink); background-color: color-mix(in srgb, var(--blue) 12%, var(--surface)); background-image: linear-gradient(color-mix(in srgb, var(--ink) 11%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--ink) 11%, transparent) 1px, transparent 1px); background-size: 20px 20px; }
+.shot .render, .shot img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.shot img { object-fit: cover; }
+.proj .kicker { color: var(--red); margin: 0 0 10px; }
+.proj h3 { margin: 0 0 18px; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 0.92; }
+.metric { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 18px; }
+.metric b { font-family: var(--font-display); font-weight: 900; font-size: clamp(4rem, 9vw, 6.5rem); line-height: 0.8; color: var(--red); }
+.metric span { color: var(--muted); max-width: 16em; line-height: 1.3; }
+.proj ul { margin: 0 0 18px; padding-left: 1.1em; display: grid; gap: 8px; }
+.proj li::marker { color: var(--red); }
+.result { margin: 0 0 14px; font-weight: 600; }
+.tools { margin: 0; color: var(--muted); line-height: 1.7; }
+
+/* renders */
+.render .note { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.06em; fill: var(--muted); }
+.render .note.red { fill: var(--red); font-weight: 500; }
+.render .guide { fill: none; stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 5 4; opacity: 0.7; }
+.render .streams line { stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 14 12; animation: streamflow 1s linear infinite; }
+@keyframes streamflow { to { stroke-dashoffset: -26; } }
+.render .sonar path { opacity: 0; animation: sonar 2s ease-out infinite; }
+.render .sonar .s2 { animation-delay: 0.6s; } .render .sonar .s3 { animation-delay: 1.2s; }
+@keyframes sonar { 0% { transform: translateX(0); opacity: 0.9; } 100% { transform: translateX(34px); opacity: 0; } }
+.proj:hover .render .streams line { animation-duration: 0.4s; }
+.proj:hover .render .sonar path { animation-duration: 1.1s; }
+
+/* experience */
+.job { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 12px 56px; padding-block: 36px; border-top: 2px solid var(--ink); }
+.job h3 { margin: 0 0 6px; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 0.95; }
+.job .when { color: var(--muted); margin: 0; line-height: 1.7; }
+.job ul { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; }
+.job li::marker { color: var(--red); }
+.job strong { font-weight: 600; background: linear-gradient(transparent 62%, color-mix(in srgb, var(--yellow) 75%, transparent) 62%); }
+
+/* skills */
+.skillset { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px 56px; border-top: 2px solid var(--ink); padding-top: 32px; }
+.skillset h3 { margin: 0 0 14px; color: var(--red); font-family: var(--font-mono); font-weight: 500; font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; }
+.skillset ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 1.25rem; font-weight: 500; }
+.skillset li { transition: transform 0.15s ease, color 0.15s; width: fit-content; }
+.skillset li:hover { transform: translateX(8px); color: var(--red); }
+
+/* contact */
+.contact { margin-top: 96px; background: var(--ink); color: var(--paper); padding-block: 72px 56px; }
+.contact h2 { margin: 0 0 32px; font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: clamp(3rem, 12vw, 9rem); line-height: 0.82; }
+.contact h2 em { font-style: normal; color: var(--yellow); }
+.crow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; padding-block: 18px; border-top: 1px solid color-mix(in srgb, var(--paper) 30%, transparent); }
+.crow .mono { flex: 0 0 7ch; opacity: 0.7; }
+.crow .val { flex: 1 1 16ch; min-width: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(1.5rem, 4.6vw, 2.8rem); line-height: 1; overflow-wrap: anywhere; }
+.crow .acts { display: flex; gap: 18px; }
+.crow .acts a, .crow .acts button { font: inherit; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--paper); background: none; border: 0; padding: 6px 0; cursor: pointer; }
+.crow .acts a { color: var(--yellow); }
+.contact :focus-visible { outline-color: var(--yellow); }
+.edu { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px 40px; margin-top: 56px; opacity: 0.85; }
+.edu p { margin: 0; line-height: 1.5; }
+.edu .mono { display: block; margin-bottom: 4px; opacity: 0.7; }
+footer.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; margin-top: 56px; padding-top: 18px; border-top: 1px solid color-mix(in srgb, var(--paper) 30%, transparent); }
+
+@media (max-width: 860px) {
+  .hero-low { grid-template-columns: minmax(0, 1fr); }
+  .proj, .job { grid-template-columns: minmax(0, 1fr); }
+  .proj:nth-of-type(even) .shot { order: 0; }
+  section { padding-top: 64px; }
+}
+@media (max-width: 480px) { .knobs { grid-template-columns: minmax(0, 1fr); } }
+
+@supports (animation-timeline: view()) {
+  @keyframes slideup { from { translate: 0 36px; } to { translate: 0 0; } }
+  .proj, .job, .skillset > div, .crow { animation: slideup linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+
+<header class="band">
+  <div class="inner">
+    <div class="bar">
+      <span class="mono">Zohaib Hassan</span>
+      <nav aria-label="Sections">
+        <a class="u mono" href="#projects">Projects</a>
+        <a class="u mono" href="#experience">Experience</a>
+        <a class="u mono" href="#skills">Skills</a>
+        <a class="u mono" href="#contact">Contact</a>
+      </nav>
+    </div>
+    <h1 class="name" aria-label="Zohaib Hassan">
+      <span class="line" aria-hidden="true"><span class="l" style="--i:0">Z</span><span class="l" style="--i:1">o</span><span class="l" style="--i:2">h</span><span class="l" style="--i:3">a</span><span class="l" style="--i:4">i</span><span class="l" style="--i:5">b</span></span>
+      <span class="line" aria-hidden="true"><span class="l" style="--i:6">H</span><span class="l" style="--i:7">a</span><span class="l" style="--i:8">s</span><span class="l" style="--i:9">s</span><span class="l" style="--i:10">a</span><span class="l" style="--i:11">n</span></span>
+    </h1>
+    <div class="hero-low">
+      <div>
+        <p class="lede">I design, print and program small machines. SolidWorks models that cut weight, Arduino robots tuned with PID control, and prototypes tested until they fit and work.</p>
+        <p class="facts mono">Engineering student<br>University of Guelph, 2025 to 2030<br>Ontario, Canada</p>
+      </div>
+      <figure class="scope" aria-label="Interactive PID tuning plot">
+        <div class="screen">
+          <canvas id="pid-canvas" width="720" height="360"></canvas>
+          <div class="readout mono"><span id="ro-over">Overshoot 0%</span><span id="ro-settle">Settles in 0.0 s</span></div>
+        </div>
+        <div class="knobs">
+          <div class="knob"><label class="mono" for="kp">Kp <output id="kp-o">2.0</output></label><input id="kp" type="range" min="0.2" max="6" step="0.1" value="2"></div>
+          <div class="knob"><label class="mono" for="ki">Ki <output id="ki-o">1.0</output></label><input id="ki" type="range" min="0" max="6" step="0.1" value="1"></div>
+          <div class="knob"><label class="mono" for="kd">Kd <output id="kd-o">0.3</output></label><input id="kd" type="range" min="0" max="1.5" step="0.05" value="0.3"></div>
+        </div>
+        <figcaption class="mono">PID is how my robot holds its path. Tune a simple motor model and watch it overshoot, ring and settle.</figcaption>
+      </figure>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="projects">
+  <div class="inner">
+    <div class="sec-title"><h2>Projects</h2><span class="mono">Design, build, test, repeat</span></div>
+
+    <article class="proj">
+      <div class="shot"><!-- To use a real photo, replace the svg with: <img src="photos/robot.jpg" alt="Obstacle-avoiding robot"> -->
+<svg class="render" viewBox="0 0 320 200" role="img" aria-label="CAD render of an Arduino robot with an ultrasonic sensor sending out pings toward an obstacle">
+            <line x1="10" y1="164" x2="310" y2="164" stroke="var(--ink)" stroke-width="2" />
+            <!-- chassis -->
+            <rect x="60" y="106" width="156" height="34" rx="6" fill="var(--blue)" stroke="var(--ink)" stroke-width="2.5" />
+            <!-- arduino board -->
+            <rect x="80" y="84" width="76" height="22" rx="3" fill="var(--green)" stroke="var(--ink)" stroke-width="2.5" />
+            <rect x="88" y="89" width="14" height="10" rx="1" fill="var(--ink)" />
+            <rect x="110" y="89" width="22" height="10" rx="1" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5" />
+            <circle cx="144" cy="94" r="3" fill="var(--yellow)" stroke="var(--ink)" stroke-width="1.5" />
+            <!-- IR sensor -->
+            <rect x="172" y="92" width="16" height="14" rx="2" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5" />
+            <!-- ultrasonic sensor -->
+            <rect x="214" y="108" width="14" height="30" rx="3" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.5" />
+            <circle cx="221" cy="116" r="4.5" fill="var(--ink)" /><circle cx="221" cy="130" r="4.5" fill="var(--ink)" />
+            <!-- wheels -->
+            <g transform="translate(94 146)">
+              <circle r="18" fill="var(--surface)" stroke="var(--ink)" stroke-width="3.5" />
+              <g stroke="var(--ink)" stroke-width="2"><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="2.4s" repeatCount="indefinite" /><line x1="-14" y1="0" x2="14" y2="0" /><line x1="0" y1="-14" x2="0" y2="14" /><line x1="-10" y1="-10" x2="10" y2="10" /><line x1="10" y1="-10" x2="-10" y2="10" /></g>
+              <circle r="4" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2" />
+            </g>
+            <g transform="translate(184 146)">
+              <circle r="18" fill="var(--surface)" stroke="var(--ink)" stroke-width="3.5" />
+              <g stroke="var(--ink)" stroke-width="2"><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="2.4s" repeatCount="indefinite" /><line x1="-14" y1="0" x2="14" y2="0" /><line x1="0" y1="-14" x2="0" y2="14" /><line x1="-10" y1="-10" x2="10" y2="10" /><line x1="10" y1="-10" x2="-10" y2="10" /></g>
+              <circle r="4" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2" />
+            </g>
+            <!-- sonar pings -->
+            <g class="sonar" fill="none" stroke="var(--red)" stroke-width="2.5" stroke-linecap="round">
+              <path class="s1" d="M236 108 A22 22 0 0 1 236 138" /><path class="s2" d="M236 108 A22 22 0 0 1 236 138" /><path class="s3" d="M236 108 A22 22 0 0 1 236 138" />
+            </g>
+            <!-- obstacle -->
+            <rect x="284" y="118" width="26" height="46" fill="var(--red)" stroke="var(--ink)" stroke-width="2.5" />
+            <path d="M284 130 L310 118 M284 146 L310 134 M284 162 L310 150" stroke="var(--ink)" stroke-width="1.5" opacity="0.6" />
+            <!-- labels -->
+            <path d="M221 104 V70 H250" fill="none" stroke="var(--red)" stroke-width="1.6" />
+            <text x="254" y="73" class="note red">ULTRASONIC</text>
+            <path d="M180 92 V54 H206" fill="none" stroke="var(--red)" stroke-width="1.6" />
+            <text x="210" y="57" class="note red">IR SENSOR</text>
+            <text x="14" y="22" class="note">OBSTACLE-AVOIDING ROBOT</text>
+            <text x="14" y="36" class="note">ARDUINO + PID CONTROL</text>
+            <text x="80" y="80" class="note">ARDUINO</text>
+          </svg>
+      </div>
+      <div>
+        <p class="kicker mono">Embedded / Control</p>
+        <h3>Obstacle-Avoiding Robot</h3>
+        <p class="metric"><b>90%</b><span>path-tracking accuracy, and it worked in 83% of new environments</span></p>
+        <ul>
+          <li>Built a robot that follows routes and avoids obstacles, using IR and ultrasonic sensors on an Arduino.</li>
+          <li>Wrote embedded C/C++ that reads sensor data in real time and runs the navigation logic.</li>
+          <li>Applied PID control through PWM signals to steady the robot's motion.</li>
+          <li>Tested and tuned the control variables and thresholds across many runs.</li>
+        </ul>
+        <p class="tools mono">Arduino / C/C++ / PID control / IR sensors / Ultrasonic sensors</p>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="shot"><!-- To use a real photo, replace the svg with: <img src="photos/wheelchair.jpg" alt="Eco-accessible wheelchair prototype"> -->
+<svg class="render" viewBox="0 0 320 200" role="img" aria-label="CAD render of a wheelchair in side view with a turning rear wheel and dimension lines">
+            <line x1="10" y1="172" x2="310" y2="172" stroke="var(--ink)" stroke-width="2" />
+            <!-- frame -->
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M94 54 L106 112 L196 112 L234 152 H254" stroke="var(--ink)" stroke-width="8" />
+              <path d="M94 54 L106 112 L196 112 L234 152 H254" stroke="var(--blue)" stroke-width="3.5" />
+              <path d="M94 54 L80 52" stroke="var(--ink)" stroke-width="6" />
+              <path d="M122 112 V128" stroke="var(--ink)" stroke-width="6" />
+            </g>
+            <!-- cushions -->
+            <rect x="104" y="98" width="96" height="14" rx="6" fill="var(--red)" stroke="var(--ink)" stroke-width="2.5" />
+            <path d="M89 58 L100 106" stroke="var(--ink)" stroke-width="13" stroke-linecap="round" />
+            <path d="M89 58 L100 106" stroke="var(--red)" stroke-width="8" stroke-linecap="round" />
+            <!-- caster -->
+            <circle cx="238" cy="160" r="12" fill="var(--surface)" stroke="var(--ink)" stroke-width="3" />
+            <circle cx="238" cy="160" r="3" fill="var(--ink)" />
+            <!-- rear wheel -->
+            <g transform="translate(122 128)">
+              <circle r="44" fill="none" stroke="var(--ink)" stroke-width="4.5" />
+              <circle r="36" fill="none" stroke="var(--ink)" stroke-width="1.5" />
+              <g stroke="var(--ink)" stroke-width="1.5"><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="9s" repeatCount="indefinite" /><line x1="-36" y1="0" x2="36" y2="0" /><line x1="0" y1="-36" x2="0" y2="36" /><line x1="-25" y1="-25" x2="25" y2="25" /><line x1="25" y1="-25" x2="-25" y2="25" /><line x1="-33" y1="-14" x2="33" y2="14" /><line x1="-33" y1="14" x2="33" y2="-14" /><line x1="-14" y1="-33" x2="14" y2="33" /><line x1="14" y1="-33" x2="-14" y2="33" /></g>
+              <circle r="7" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5" />
+            </g>
+            <!-- eco leaf -->
+            <path d="M262 62 C262 40 280 32 296 34 C296 52 284 66 262 62 Z" fill="var(--green)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round" />
+            <path d="M264 60 L286 42" stroke="var(--ink)" stroke-width="1.5" fill="none" />
+            <!-- dimensions -->
+            <path d="M78 188 H254 M78 182 V194 M254 182 V194" fill="none" stroke="var(--red)" stroke-width="1.6" />
+            <text x="160" y="186" class="note red">LENGTH</text>
+            <path d="M300 82 V172 M294 82 H306" fill="none" stroke="var(--red)" stroke-width="1.6" />
+            <text x="14" y="22" class="note">ECO-ACCESSIBLE WHEELCHAIR</text>
+            <text x="14" y="36" class="note">SIDE VIEW, TEAM OF 6</text>
+          </svg>
+      </div>
+      <div>
+        <p class="kicker mono">Mechanical / Team of 6</p>
+        <h3>Eco-Accessible Wheelchair</h3>
+        <p class="metric"><b>15+</b><span>sketches and CAD models compared before the final design</span></p>
+        <ul>
+          <li>Started from accessibility needs and design constraints and produced a wheelchair concept that balances safety and cost.</li>
+          <li>Ran trade-off analyses on cost, materials and safety to support the final design decision.</li>
+          <li>Built a prototype with the team and documented the design reasoning, limitations and manufacturing techniques.</li>
+        </ul>
+        <p class="tools mono">SolidWorks / CAD / Engineering design process</p>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="shot"><!-- To use a real photo, replace the svg with: <img src="photos/servo-arm.jpg" alt="Two-joint servo arm"> -->
+<svg class="render" viewBox="0 0 320 200" role="img" aria-label="CAD render of a two-joint servo arm sweeping through both joints">
+            <path class="guide" d="M200 150 A110 110 0 0 0 148 56" />
+            <path class="guide" d="M90 150 H210" />
+            <!-- base plate and first servo -->
+            <rect x="34" y="176" width="112" height="10" rx="2" fill="var(--ink)" />
+            <rect x="52" y="140" width="76" height="36" rx="4" fill="var(--blue)" stroke="var(--ink)" stroke-width="2.5" />
+            <rect x="60" y="148" width="26" height="6" rx="2" fill="var(--surface)" opacity="0.7" />
+            <!-- link 1 with servo 2 -->
+            <g>
+              <animateTransform attributeName="transform" type="rotate" values="-12 90 150;-58 90 150;-12 90 150" dur="5s" repeatCount="indefinite" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1" keyTimes="0;0.5;1" />
+              <rect x="78" y="140" width="136" height="20" rx="10" fill="var(--red)" stroke="var(--ink)" stroke-width="2.5" />
+              <circle cx="202" cy="150" r="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5" />
+              <rect x="176" y="130" width="40" height="40" rx="5" fill="var(--blue)" stroke="var(--ink)" stroke-width="2.5" />
+              <g transform="translate(202 150)">
+                <g>
+                  <animateTransform attributeName="transform" type="rotate" values="35 0 0;-25 0 0;35 0 0" dur="5s" repeatCount="indefinite" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1" keyTimes="0;0.5;1" />
+                  <rect x="-10" y="-9" width="96" height="18" rx="9" fill="var(--red)" stroke="var(--ink)" stroke-width="2.5" />
+                  <circle cx="0" cy="0" r="9" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5" />
+                  <circle cx="0" cy="0" r="3" fill="var(--ink)" />
+                  <path d="M86 -9 L104 -12 L104 -3 L90 0 L104 3 L104 12 L86 9 Z" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round" />
+                </g>
+              </g>
+              <circle cx="90" cy="150" r="9" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5" />
+              <circle cx="90" cy="150" r="3" fill="var(--ink)" />
+            </g>
+            <text x="14" y="22" class="note">2-DOF ARM</text>
+            <text x="14" y="36" class="note">L1 + L2, 2 SERVOS</text>
+            <text x="222" y="120" class="note red">θ1</text>
+          </svg>
+      </div>
+      <div>
+        <p class="kicker mono">Mechatronics</p>
+        <h3>2-DOF Servo Arm</h3>
+        <p class="metric"><b>2</b><span>servo-driven joints moving under code control</span></p>
+        <ul>
+          <li>Designed the links and joints of a two-joint arm in SolidWorks and 3D printed them for assembly.</li>
+          <li>Wrote Arduino C/C++ code that drives two servos and positions the arm through both joints.</li>
+          <li>Tested the assembled arm, then refined the mechanical design and the control code from what the tests showed.</li>
+        </ul>
+        <p class="tools mono">SolidWorks / 3D printing / Arduino / C/C++</p>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="shot"><!-- To use a real photo, replace the svg with: <img src="photos/pipe-part.jpg" alt="3D printed part fitted in a pipe"> -->
+<svg class="render" viewBox="0 0 320 200" role="img" aria-label="CAD render of a printed custom part fitted inside a pipe with water flowing through it">
+            <defs>
+              <pattern id="pipe-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <rect width="7" height="7" fill="var(--surface)" />
+                <line x1="0" y1="0" x2="0" y2="7" stroke="var(--ink)" stroke-width="1.5" />
+              </pattern>
+            </defs>
+            <!-- pipe walls in section -->
+            <rect x="0" y="58" width="320" height="16" fill="url(#pipe-hatch)" stroke="var(--ink)" stroke-width="2" />
+            <rect x="0" y="126" width="320" height="16" fill="url(#pipe-hatch)" stroke="var(--ink)" stroke-width="2" />
+            <!-- water -->
+            <rect x="0" y="74" width="320" height="52" fill="#5FB0FF" opacity="0.35" />
+            <!-- custom part -->
+            <path d="M120 74 H200 L184 91 H136 Z" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round" />
+            <path d="M120 126 H200 L184 109 H136 Z" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round" />
+            <rect x="110" y="52" width="12" height="96" rx="3" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5" />
+            <rect x="198" y="52" width="12" height="96" rx="3" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5" />
+            <circle cx="116" cy="62" r="2" fill="var(--ink)" /><circle cx="116" cy="138" r="2" fill="var(--ink)" />
+            <circle cx="204" cy="62" r="2" fill="var(--ink)" /><circle cx="204" cy="138" r="2" fill="var(--ink)" />
+            <!-- flow lines -->
+            <g class="streams">
+              <line x1="10" y1="86" x2="100" y2="86" /><line x1="10" y1="100" x2="100" y2="100" /><line x1="10" y1="114" x2="100" y2="114" />
+              <line x1="140" y1="100" x2="180" y2="100" />
+              <line x1="220" y1="86" x2="310" y2="86" /><line x1="220" y1="100" x2="310" y2="100" /><line x1="220" y1="114" x2="310" y2="114" />
+            </g>
+            <!-- leader and dimension -->
+            <path d="M160 52 V28 H196" fill="none" stroke="var(--red)" stroke-width="1.8" />
+            <text x="200" y="32" class="note red">CUSTOM PART</text>
+            <path d="M110 168 H210 M110 162 V174 M210 162 V174" fill="none" stroke="var(--red)" stroke-width="1.8" />
+            <text x="14" y="22" class="note">PIPE SECTION</text>
+            <text x="14" y="188" class="note">PRINTED PART, SECTION VIEW</text>
+          </svg>
+      </div>
+      <div>
+        <p class="kicker mono">Fluid flow / Prototyping</p>
+        <h3>Pipe Water-Flow Part</h3>
+        <p class="metric"><b>Fixed</b><span>the printed part fully resolved the flow issue</span></p>
+        <ul>
+          <li>Found a water-flow problem in a pipe and modelled a custom part in SolidWorks to fix it.</li>
+          <li>3D printed the part and went through several versions until it fit the pipe system properly.</li>
+          <li>Tested the final print under real water flow.</li>
+        </ul>
+        <p class="tools mono">SolidWorks / 3D printing</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="inner">
+    <div class="sec-title"><h2>Experience</h2><span class="mono">Two roles, both current</span></div>
+    <div class="job">
+      <div>
+        <h3>Robotics Team Member</h3>
+        <p class="when mono">Robotics Team, Guelph, Ontario<br>Sep 2025 to present</p>
+      </div>
+      <ul>
+        <li>Responded to team requests by testing and troubleshooting <strong>12+</strong> system components, then improving the designs.</li>
+        <li>Worked with a multidisciplinary team to assemble, test and optimize robot parts, reaching <strong>90%</strong> assembly efficiency.</li>
+        <li>Designed and optimized <strong>10+</strong> complex 3D models in SolidWorks to cut robot weight by <strong>12%</strong>.</li>
+        <li>Ran 3D printers to produce prototypes and functional parts so the team could test and develop designs.</li>
+      </ul>
+    </div>
+    <div class="job">
+      <div>
+        <h3>Barista</h3>
+        <p class="when mono">Starbucks, Milton, Ontario<br>Feb 2026 to present</p>
+      </div>
+      <ul>
+        <li>Prepared and served beverages and food in a fast-paced, high-volume store while keeping quality and speed up.</li>
+        <li>Resolved customer concerns quickly with friendly, attentive service.</li>
+        <li>Worked with teammates to keep the store stocked, clean and compliant with food safety standards.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="inner">
+    <div class="sec-title"><h2>Skills</h2><span class="mono">Software, hardware, people</span></div>
+    <div class="skillset">
+      <div><h3>Programming and tools</h3><ul><li>Java</li><li>C/C++</li><li>Python</li><li>JavaScript</li><li>React</li><li>HTML and CSS</li><li>Git and GitHub</li></ul></div>
+      <div><h3>Hardware and design</h3><ul><li>SolidWorks</li><li>AutoCAD</li><li>MATLAB</li><li>Arduino</li><li>Circuit design</li><li>Soldering</li><li>3D printing</li></ul></div>
+      <div><h3>Working with others</h3><ul><li>Problem-solving</li><li>Teamwork</li><li>Resilience</li><li>Adaptability</li><li>Customer service</li></ul></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="contact" id="contact">
+  <div class="inner">
+    <h2>Let's build <em>something.</em></h2>
+    <div class="crow">
+      <span class="mono">Email</span>
+      <span class="val" id="email-val">zohaibhassan5366@gmail.com</span>
+      <span class="acts"><a class="u" href="mailto:zohaibhassan5366@gmail.com">Email me</a><button class="u" type="button" data-target="email-val">Copy</button></span>
+    </div>
+    <div class="crow">
+      <span class="mono">Phone</span>
+      <span class="val" id="phone-val">+1 289-400-1362</span>
+      <span class="acts"><a class="u" href="tel:+12894001362">Call me</a><button class="u" type="button" data-target="phone-val">Copy</button></span>
+    </div>
+    <div class="edu">
+      <p><span class="mono">Now studying</span>Bachelor of Engineering<br>University of Guelph, Ontario, 2025 to 2030</p>
+    </div>
+    <footer class="foot mono"><span>Zohaib Hassan</span><span>Ontario, Canada</span></footer>
+  </div>
+</div>
+
+<script>
+(function () {
+  var reduce = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  if (reduce) { document.querySelectorAll('svg.render').forEach(function (s) { if (s.pauseAnimations) s.pauseAnimations(); }); }
+
+  /* PID tuning scope: x'' = -1.5 x' + 8 u, step to 1.0 */
+  var cv = document.getElementById('pid-canvas');
+  var ctx = cv.getContext('2d');
+  var kp = document.getElementById('kp'), ki = document.getElementById('ki'), kd = document.getElementById('kd');
+  var T = 6, DT = 0.005;
+  function sim(p, i, d) {
+    var n = Math.round(T / DT), x = 0, v = 0, I = 0, out = new Array(n + 1);
+    out[0] = 0;
+    for (var s = 1; s <= n; s++) {
+      var e = 1 - x;
+      I += e * DT; I = Math.max(-3, Math.min(3, I));
+      var u = p * e + i * I - d * v;
+      u = Math.max(-12, Math.min(12, u));
+      v += (-1.5 * v + 8 * u) * DT;
+      x += v * DT;
+      if (!isFinite(x)) x = 1e6;
+      out[s] = x;
+    }
+    return out;
+  }
+  var data = [], prog = 1, raf = 0;
+  function size() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = cv.clientWidth || 600;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(w / 2 * dpr);
+    return dpr;
+  }
+  function draw() {
+    var dpr = size(), W = cv.width, H = cv.height;
+    var padL = 34 * dpr, padR = 14 * dpr, padT = 40 * dpr, padB = 24 * dpr;
+    var pw = W - padL - padR, ph = H - padT - padB;
+    var peak = 0; for (var k = 0; k < data.length; k++) if (data[k] > peak) peak = data[k];
+    var ymax = Math.max(1.4, Math.min(peak, 2.2) + 0.1), ymin = -0.1;
+    function X(t) { return padL + (t / T) * pw; }
+    function Y(v) { return padT + (1 - (Math.max(ymin, Math.min(ymax, v)) - ymin) / (ymax - ymin)) * ph; }
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0B0F1A'; ctx.fillRect(0, 0, W, H);
+    ctx.font = (10 * dpr) + 'px "Martian Mono", monospace';
+    ctx.lineWidth = 1 * dpr;
+    ctx.strokeStyle = 'rgba(160,175,210,0.16)'; ctx.fillStyle = 'rgba(160,175,210,0.7)';
+    for (var t = 0; t <= T; t += 1) { ctx.beginPath(); ctx.moveTo(X(t), padT); ctx.lineTo(X(t), padT + ph); ctx.stroke(); ctx.fillText(t + 's', X(t) - 5 * dpr, H - 7 * dpr); }
+    [0, 0.5, 1, 1.5, 2].forEach(function (g) { if (g > ymax) return; ctx.beginPath(); ctx.moveTo(padL, Y(g)); ctx.lineTo(padL + pw, Y(g)); ctx.stroke(); ctx.fillText(g.toFixed(1), 4 * dpr, Y(g) + 3 * dpr); });
+    ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(padL, Y(1.02), pw, Y(0.98) - Y(1.02));
+    ctx.setLineDash([6 * dpr, 5 * dpr]); ctx.strokeStyle = 'rgba(255,255,255,0.75)'; ctx.lineWidth = 1.5 * dpr;
+    ctx.beginPath(); ctx.moveTo(padL, Y(1)); ctx.lineTo(padL + pw, Y(1)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle = '#FFD21A'; ctx.lineWidth = 2.6 * dpr; ctx.lineJoin = 'round'; ctx.beginPath();
+    var last = Math.max(1, Math.floor((data.length - 1) * prog));
+    for (var s = 0; s <= last; s++) { var px = X(s * DT), py = Y(data[s]); if (s === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+    ctx.stroke();
+  }
+  function metrics() {
+    var peak = 0, lastOut = 0;
+    for (var s = 0; s < data.length; s++) { if (data[s] > peak) peak = data[s]; if (Math.abs(data[s] - 1) > 0.02) lastOut = s; }
+    var over = Math.max(0, peak - 1) * 100;
+    var o = document.getElementById('ro-over'), st = document.getElementById('ro-settle');
+    o.textContent = peak > 5 ? 'Unstable' : 'Overshoot ' + Math.round(over) + '%';
+    st.textContent = (lastOut >= data.length - 2 || peak > 5) ? 'Not settled in 6 s' : 'Settles in ' + (lastOut * DT).toFixed(1) + ' s';
+  }
+  function update(animate) {
+    document.getElementById('kp-o').textContent = (+kp.value).toFixed(1);
+    document.getElementById('ki-o').textContent = (+ki.value).toFixed(1);
+    document.getElementById('kd-o').textContent = (+kd.value).toFixed(2).replace(/0$/, '');
+    data = sim(+kp.value, +ki.value, +kd.value);
+    metrics();
+    cancelAnimationFrame(raf);
+    if (animate && !reduce) {
+      var t0 = null; prog = 0;
+      (function step(ts) { if (t0 === null) t0 = ts; prog = Math.min(1, (ts - t0) / 900); draw(); if (prog < 1) raf = requestAnimationFrame(step); })(performance.now());
+    } else { prog = 1; draw(); }
+  }
+  [kp, ki, kd].forEach(function (el) { el.addEventListener('input', function () { update(false); }); });
+  window.addEventListener('resize', function () { draw(); });
+  update(true);
+
+  /* copy buttons */
+  document.querySelectorAll('button[data-target]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var el = document.getElementById(btn.getAttribute('data-target'));
+      var text = el.textContent.trim();
+      var done = function (msg) { btn.textContent = msg; setTimeout(function () { btn.textContent = 'Copy'; }, 1600); };
+      var fallback = function () {
+        try { var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); done('Selected'); } catch (e) { done('Copy'); }
+      };
+      try { navigator.clipboard.writeText(text).then(function () { done('Copied'); }, fallback); } catch (e) { fallback(); }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
